@@ -1,0 +1,17 @@
+﻿@model KsiazkaKucharska.Models.Category
+@{
+    ViewData["Title"] = "Delete category";
+}
+
+<h1>Delete category</h1>
+
+<div class="alert alert-warning">
+    Are you sure you want to delete: <b>@Model.Name</b>?
+</div>
+
+<form method="post">
+    @Html.AntiForgeryToken()
+    <div class="text-danger">@Html.ValidationSummary()</div>
+    <button class="btn btn-danger" type="submit">Delete</button>
+    <a class="btn btn-outline-secondary" asp-action="Index">Cancel</a>
+</form>

@@ -1,0 +1,32 @@
+﻿@model List<KsiazkaKucharska.Models.Ingredient>
+@{
+    ViewData["Title"] = "Ingredients";
+}
+
+<h1>Ingredients</h1>
+
+<p>
+    <a class="btn btn-primary" asp-action="Create">+ Add ingredient</a>
+    <a class="btn btn-outline-secondary" asp-controller="Recipes" asp-action="Index">Back to recipes</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var i in Model)
+        {
+            <tr>
+                <td>@i.Name</td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@i.Id">Edit</a>
+                    <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@i.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

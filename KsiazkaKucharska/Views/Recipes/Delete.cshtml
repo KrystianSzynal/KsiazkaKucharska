@@ -1,0 +1,16 @@
+﻿@model KsiazkaKucharska.Models.Recipe
+@{
+    ViewData["Title"] = "Delete recipe";
+}
+
+<h1>Delete recipe</h1>
+
+<div class="alert alert-warning">
+    Are you sure you want to delete: <b>@Model.Title</b>?
+</div>
+
+<form method="post">
+    @Html.AntiForgeryToken()
+    <button class="btn btn-danger" type="submit">Delete</button>
+    <a class="btn btn-outline-secondary" asp-action="Details" asp-route-id="@Model.Id">Cancel</a>
+</form>

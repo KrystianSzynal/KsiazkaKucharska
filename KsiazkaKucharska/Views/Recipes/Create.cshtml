@@ -1,0 +1,145 @@
+﻿@model KsiazkaKucharska.VievModels.RecipeFormVM
+@{
+    ViewData["Title"] = "Create recipe";
+}
+
+<h1>Create recipe</h1>
+
+<form method="post" class="card card-body">
+    @Html.AntiForgeryToken()
+
+    <div class="row g-2">
+        <div class="col-md-6">
+            <label class="form-label">Title</label>
+            <input class="form-control" asp-for="Title" />
+            <span class="text-danger" asp-validation-for="Title"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Category</label>
+            <select class="form-select" asp-for="CategoryId" asp-items="Model.CategoryOptions"></select>
+            <span class="text-danger" asp-validation-for="CategoryId"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Difficulty</label>
+            <select class="form-select" asp-for="Difficulty" asp-items="Html.GetEnumSelectList<KsiazkaKucharska.Models.Difficulty>()"></select>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Description</label>
+            <input class="form-control" asp-for="Description" />
+            <span class="text-danger" asp-validation-for="Description"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Prep time (min)</label>
+            <input class="form-control" asp-for="PrepTimeMinutes" />
+            <span class="text-danger" asp-validation-for="PrepTimeMinutes"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Portions</label>
+            <input class="form-control" asp-for="Portions" />
+            <span class="text-danger" asp-validation-for="Portions"></span>
+        </div>
+    </div>
+
+    <div class="mt-2">
+        <label class="form-label">Instructions</label>
+        <textarea class="form-control" asp-for="Instructions" rows="7"></textarea>
+        <span class="text-danger" asp-validation-for="Instructions"></span>
+    </div>
+
+    <hr />
+
+    <h3>Ingredients</h3>
+
+    <table class="table" id="ingredientsTable">
+        <thead>
+            <tr>
+                <th style="width: 45%">Ingredient</th>
+                <th style="width: 20%">Amount</th>
+                <th style="width: 20%">Unit</th>
+                <th style="width: 15%"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Ingredients.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <select class="form-select" name="Ingredients[@i].IngredientId">
+                            @foreach (var opt in Model.IngredientOptions)
+                            {
+                                <option value="@opt.Value" selected="@(opt.Value == Model.Ingredients[i].IngredientId.ToString() ? "selected" : null)">@opt.Text</option>
+                            }
+                        </select>
+                    </td>
+                    <td>
+                        <input class="form-control" name="Ingredients[@i].Amount" value="@Model.Ingredients[i].Amount" />
+                    </td>
+                    <td>
+                        <input class="form-control" name="Ingredients[@i].Unit" value="@Model.Ingredients[i].Unit" />
+                    </td>
+                    <td class="text-end">
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeRow(this)">Remove</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="button" class="btn btn-outline-primary" onclick="addRow()">+ Add ingredient row</button>
+
+    <div class="mt-3">
+        <button class="btn btn-success" type="submit">Save</button>
+        <a class="btn btn-outline-secondary" asp-action="Index">Cancel</a>
+    </div>
+
+    <div class="text-danger mt-2">
+        @Html.ValidationSummary()
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const ingredientOptionsHtml = `@Html.Raw(string.Join("", Model.IngredientOptions.Select(o => $"<option value='{o.Value}'>{o.Text}</option>")))`;
+
+        function addRow() {
+            const tbody = document.querySelector("#ingredientsTable tbody");
+            const index = tbody.querySelectorAll("tr").length;
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>
+                    <select class="form-select" name="Ingredients[${index}].IngredientId">
+                        ${ingredientOptionsHtml}
+                    </select>
+                </td>
+                <td><input class="form-control" name="Ingredients[${index}].Amount" value="1" /></td>
+                <td><input class="form-control" name="Ingredients[${index}].Unit" value="g" /></td>
+                <td class="text-end">
+                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeRow(this)">Remove</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function removeRow(btn) {
+            const tr = btn.closest("tr");
+            tr.remove();
+            reindexRows();
+        }
+
+        function reindexRows() {
+            const rows = document.querySelectorAll("#ingredientsTable tbody tr");
+            rows.forEach((row, i) => {
+                row.querySelectorAll("select,input").forEach(el => {
+                    el.name = el.name.replace(/Ingredients\[\d+\]/, `Ingredients[${i}]`);
+                });
+            });
+        }
+    </script>
+}

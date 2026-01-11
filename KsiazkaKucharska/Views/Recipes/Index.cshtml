@@ -1,0 +1,96 @@
+﻿@model KsiazkaKucharska.VievModels.RecipeIndexVM
+@{
+    ViewData["Title"] = "Recipes";
+}
+
+<h1>Recipes</h1>
+
+<p>
+    <a class="btn btn-primary" asp-action="Create">+ Add recipe</a>
+    <a class="btn btn-outline-secondary" asp-controller="Ingredients" asp-action="Index">Ingredients</a>
+    <a class="btn btn-outline-secondary" asp-controller="Categories" asp-action="Index">Categories</a>
+</p>
+
+<form method="get" class="card shadow-sm mb-4 border-0">
+    <div class="card-header bg-primary text-white py-2">
+        <h5 class="mb-0">🔍 Filtrowanie przepisów</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="row g-3">
+            @* Pole wyszukiwania *@
+            <div class="col-md-4">
+                <label class="form-label fw-bold small text-muted">Szukaj frazy</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0">🔍</span>
+                    <input class="form-control border-start-0 shadow-none" name="q" value="@Model.Q" placeholder="np. kurczak, zupa..." />
+                </div>
+            </div>
+
+            @* Wybór kategorii *@
+            <div class="col-md-3">
+                <label class="form-label fw-bold small text-muted">Kategoria</label>
+                <select class="form-select shadow-none" name="categoryId" asp-items="Model.CategoryOptions">
+                    <option value="">Wszystkie kategorie</option>
+                </select>
+            </div>
+
+            @* Wybór składników *@
+            <div class="col-md-5">
+                <label class="form-label fw-bold small text-muted">Składniki (Ctrl + klik)</label>
+                <select class="form-select shadow-none" name="ingredientIds" asp-items="Model.IngredientOptions" multiple size="3">
+                </select>
+                <div class="form-text small text-end">Przytrzymaj Ctrl, aby wybrać kilka</div>
+            </div>
+        </div>
+
+        <div class="mt-3 d-flex align-items-center justify-content-between border-top pt-3">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="matchAllIngredients" value="true" id="matchCheck" @(Model.MatchAllIngredients ? "checked" : "")>
+                <label class="form-check-label fw-bold" for="matchCheck">Wszystkie składniki naraz</label>
+            </div>
+            <div>
+                <button class="btn btn-primary px-4 fw-bold shadow-sm" type="submit">Filtruj</button>
+                <a class="btn btn-outline-secondary px-4 shadow-sm ms-2" asp-action="Index">Resetuj</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+@if (Model.Results.Count == 0)
+{
+    <div class="alert alert-info shadow-sm">Nie znaleziono żadnych przepisów.</div>
+}
+else
+{
+    <div class="row">
+        @foreach (var r in Model.Results)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm border-0 bg-light">
+                    @* Jeśli masz w bazie link do zdjęcia, możesz go dodać tutaj *@
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge rounded-pill bg-warning text-dark">@r.CategoryName</span>
+                            <small class="text-muted">⏱️ @r.PrepTimeMinutes min</small>
+                        </div>
+
+                        <h5 class="card-title fw-bold text-dark">@r.Title</h5>
+
+                        <p class="card-text mb-3">
+                            <span class="text-secondary">Ocena:</span>
+                            <strong>@(r.RatingsCount == 0 ? "Brak ocen" : $"⭐ {r.AvgRating:F1} ({r.RatingsCount})")</strong>
+                        </p>
+                    </div>
+
+                    <div class="card-footer bg-white border-0 pb-3">
+                        <div class="btn-group w-100">
+                            <a class="btn btn-primary" asp-action="Details" asp-route-id="@r.Id">Szczegóły</a>
+                            <a class="btn btn-outline-secondary" asp-action="Edit" asp-route-id="@r.Id">Edytuj</a>
+                            <a class="btn btn-outline-danger" asp-action="Delete" asp-route-id="@r.Id">Usuń</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
